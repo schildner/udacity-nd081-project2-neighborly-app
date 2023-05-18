@@ -31,6 +31,21 @@ Run the script to
 ./setup_project.sh
 ```
 
+Then activate venv and install dependencies.
+
+```bash
+cd NeighborlyAPI
+python -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
+```
+
+And deploy functions to the Function App in azure.
+
+```bash
+func azure functionapp publish neighborlyapp-es81 --python --build remote
+```
+
 ### Deploy client-side web application
 
 TODO...
