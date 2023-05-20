@@ -116,14 +116,16 @@ func init --docker-only --python
 docker build -t "${ACR_REGISTRY}.azurecr.io/${FUNCTION_APP_NAME}:latest" .
 ```
 
-Then dockerize the app and deploy it to AKS.
+Push the image & optionaly test it locally (typically **saves time :eyes:**)
 
 ```bash
-# Optionaly (typically saves time :eyes:) Test the image locally
 docker run -p 7071:7071 -it "${ACR_REGISTRY}.azurecr.io/${FUNCTION_APP_NAME}:latest"
-
 docker push "${ACR_REGISTRY}.azurecr.io/${FUNCTION_APP_NAME}:latest"
+```
 
+Then deploy the app to AKS.
+
+```bash
 func kubernetes deploy \
     --python \
     --name "${FUNCTION_APP_NAME}" \
