@@ -43,7 +43,7 @@ python -m pip install -r requirements.txt
 And deploy functions to the Function App in azure.
 
 ```bash
-func azure functionapp publish neighborlyapp-es81 --python --build remote
+func azure functionapp publish app-es81 --python --build remote
 ```
 
 ### Deploy client-side web application
