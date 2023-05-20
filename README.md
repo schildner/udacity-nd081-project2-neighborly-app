@@ -48,4 +48,25 @@ func azure functionapp publish neighborlyapp-es81 --python --build remote
 
 ### Deploy client-side web application
 
-TODO...
+Create a virtual environment using pipenv install.
+
+```bash
+cd NeighborlyFrontEnd
+
+# install dependencies via pipenv
+pipenv install
+pipenv shell
+
+# alternatively install dependencies via pip install
+python -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+```
+
+az webapp up \
+ -n "${WEB_APP_NAME}"\
+ -g "${RG_NAME}" \
+ --sku F1 \
+ -p frontend_asp \
+ -r PYTHON:3.8 \
+--os-type Linux

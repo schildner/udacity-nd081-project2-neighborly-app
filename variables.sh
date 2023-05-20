@@ -6,11 +6,14 @@ SUFFIX="es81" # for resources that need a unique name
 RG_NAME="nd081-project2-rg"
 LOCATION="eastus"
 STORAGE_ACCOUNT_NAME="sa${SUFFIX}"
-FUNCTION_APP_NAME="neighborlyapp-${SUFFIX}"
+FUNCTION_APP_NAME="app-${SUFFIX}"
 
 # cosmosDBAccountName needs to be lower case
 COSMOS_DB_ACCOUNT_NAME="cosmos-db-account-${SUFFIX}"
 DB_SERVER_VERSION="3.6"
-DB_NAME="neighborlydb"
+DB_NAME="db${SUFFIX}"
 COLLECTION_1="advertisements"
 COLLECTION_2="posts"
+
+# Frontend
+WEB_APP_NAME="frontend-${SUFFIX}"

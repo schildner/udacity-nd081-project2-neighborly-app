@@ -83,5 +83,16 @@ mongoimport --uri "${DB_CONNECTION_STRING}" \
     --file='./sample_data/samplePosts.json' \
     --jsonArray
 
+# Deploy the web app
+cd NeighborlyFrontEnd
+
+az webapp up \
+ -n "${WEB_APP_NAME}"\
+ -g "${RG_NAME}" \
+ -r PYTHON:3.8 \
+ -p frontend_asp \
+ --sku F1 \
+ --os-type Linux
+
 echo "To delete all resources, run the following command:"
 echo -e "${RED}az group delete --name ${RG_NAME} --no-wait --yes${NC}"
