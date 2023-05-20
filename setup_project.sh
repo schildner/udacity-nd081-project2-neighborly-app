@@ -5,7 +5,8 @@ RED='\033[0;31m'
 GREEN='\033[1;32m'
 NC='\033[0m' # No Color
 
-source ./variables.sh
+# shellcheck disable=SC1091
+source variables.sh
 
 # Create Function App
 az group create -n "${RG_NAME}" -l "${LOCATION}"
@@ -13,6 +14,7 @@ az storage account create -n "${STORAGE_ACCOUNT_NAME}" --location "${LOCATION}" 
 az functionapp create \
     -n "${FUNCTION_APP_NAME}" \
     -g "${RG_NAME}" \
+    -p backend_asp \
     --consumption-plan-location "${LOCATION}" \
     --runtime python \
     --runtime-version 3.8 \
@@ -84,7 +86,7 @@ mongoimport --uri "${DB_CONNECTION_STRING}" \
     --jsonArray
 
 # Deploy the web app
-cd NeighborlyFrontEnd
+cd NeighborlyFrontEnd || exit
 
 az webapp up \
  -n "${WEB_APP_NAME}"\
