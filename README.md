@@ -6,7 +6,7 @@ See the full [project instructions](https://github.com/udacity/nd081-c2-Building
 
 1. Create function app
 2. Deploy client-side web application
-3. Dockerfize function app and deploy to AKS
+3. Dockerize function app and deploy to AKS
 4. Event Hubs and Logic App
 5. Screenshot and Deliverables
 
