@@ -1,0 +1,136 @@
+data:
+  FUNCTIONS_WORKER_RUNTIME: cHl0aG9u
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-es81
+---
+data:
+  host.master: MDlMeXhHbDJkekk0THVqaVJvSV85N2tKY29yRVpHajZtUVZOSncxOE9UcFdBekZ1akhlX2JRPT0=
+  host.function.default: aGh5RkRzUUJhMzhmQ2pjZzY1RGxNNTlCWEVOVlV4c0tqR3Y4Rk9QV05YX0VBekZ1M2NpMVZBPT0=
+  host.systemKey.default: TXVVZjBhc25ybjVIUHpoQVlCakFjcUJPU1VCQ2ROZGZUZEZtOU0yYkFlT29BekZ1RkoydC13PT0=
+  functions.deleteadvertisement.default: U3JURm9mMHVHRVZROHB0Z0VhYS1BRGhheXNzZlZNXy0xcEViWk5RNTlvZHlBekZ1UTZON2xRPT0=
+  functions.getpost.default: NkZPNjkybDl6dGhCRzRZbnAydUpDSHVpejNyUi01N0gyLWdGbElpX2p2OGpBekZ1TUhuMGZ3PT0=
+  functions.getadvertisement.default: RFVjaEY4R05kS2dTRDQ5WF9Fc3RCWmlmZ0dWdlh6MnV1Q0ZtOTZyLVJRcW5BekZ1ejRkTk9BPT0=
+  functions.createadvertisement.default: TW5ObDNBU3NDT1RDVHJKVmZaSjFVcElQSnFVeUlhV3kySjRfUTdOTFFlNjRBekZ1cHgxRHVBPT0=
+  functions.getadvertisements.default: bHBQUHFmMFBzTlZ0MllXVEFtOGlDUVB6QnhyeXpZMDZPWmZnX2hSOTAyMnJBekZ1ZjFpUWRBPT0=
+  functions.updateadvertisement.default: SDN0ajUzSXluQk9RaXgwU2l6LWpTVGVaZERRMTlsaE9sLWZ3YkF1YURHNmFBekZ1WGJfbVpRPT0=
+  functions.getposts.default: c29xT0k0QzBueDQySGEwZGJ5N3FsQk9CNWc5NzNMTEtobmctYlBOQld6RWRBekZ1VkZ1M0l3PT0=
+apiVersion: v1
+kind: Secret
+metadata:
+  name: func-keys-kube-secret-app-es81
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: app-es81-function-keys-identity-svc-act
+---
+rules:
+- apiGroups:
+  - ''
+  resources:
+  - secrets
+  - configMaps
+  verbs:
+  - get
+  - list
+  - watch
+  - create
+  - update
+  - patch
+  - delete
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: functions-keys-manager-role
+---
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: functions-keys-manager-role
+subjects:
+- kind: ServiceAccount
+  name: app-es81-function-keys-identity-svc-act
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: app-es81-function-keys-identity-svc-act-functions-keys-manager-rolebinding
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: app-es81-http
+spec:
+  selector:
+    app: app-es81-http
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+  type: LoadBalancer
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: app-es81-http
+  labels:
+    app: app-es81-http
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: app-es81-http
+  template:
+    metadata:
+      labels:
+        app: app-es81-http
+    spec:
+      containers:
+      - name: app-es81-http
+        image: registryes81.azurecr.io/app-es81:latest
+        ports:
+        - containerPort: 80
+        env:
+        - name: AzureFunctionsJobHost__functions__0
+          value: deleteAdvertisement
+        - name: AzureFunctionsJobHost__functions__1
+          value: getPost
+        - name: AzureFunctionsJobHost__functions__2
+          value: getAdvertisement
+        - name: AzureFunctionsJobHost__functions__3
+          value: createAdvertisement
+        - name: AzureFunctionsJobHost__functions__4
+          value: getAdvertisements
+        - name: AzureFunctionsJobHost__functions__5
+          value: updateAdvertisement
+        - name: AzureFunctionsJobHost__functions__6
+          value: getPosts
+        - name: AzureWebJobsSecretStorageType
+          value: kubernetes
+        - name: AzureWebJobsKubernetesSecretName
+          value: secrets/func-keys-kube-secret-app-es81
+        envFrom:
+        - secretRef:
+            name: app-es81
+        readinessProbe:
+          failureThreshold: 3
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 240
+          httpGet:
+            path: /
+            port: 80
+            scheme: HTTP
+        startupProbe:
+          failureThreshold: 3
+          periodSeconds: 10
+          successThreshold: 1
+          timeoutSeconds: 240
+          httpGet:
+            path: /
+            port: 80
+            scheme: HTTP
+      serviceAccountName: app-es81-function-keys-identity-svc-act
+---
+

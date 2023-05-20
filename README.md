@@ -45,7 +45,7 @@ The [starter code](https://github.com/udacity/nd081-c2-Building-and-deploying-cl
 
     </details>
 
-### Run the script to deploy
+## Run the script to deploy
 
 ```bash
 ./setup_project.sh
@@ -69,11 +69,11 @@ The [starter code](https://github.com/udacity/nd081-c2-Building-and-deploying-cl
    - Create a Web App
    - Deploy the Web App to the Web App
 
-### Re-deploy the project
+## Re-deploy the project
 
 After further code adaptions each part can be deployed separately overwriting the running app.
 
-#### Functions :arrow_right: Function App
+### Functions :arrow_right: Function App
 
 ```bash
 # If some other venv is activated, deactivate it
@@ -85,7 +85,7 @@ func azure functionapp publish "${FUNCTION_APP_NAME}"\
     --build remote
 ```
 
-#### Frontend :arrow_right: App Service
+### Frontend :arrow_right: App Service
 
 ```bash
 # If some other venv is activated, deactivate it
@@ -99,4 +99,36 @@ az webapp up \
     -p frontend_asp \
     --sku F1 \
     --os-type Linux
+```
+
+## Dockerize the Function App
+
+Run the script to set up a new Azure Container Registry and AKS Cluster.
+
+```bash
+cd NeighborlyAPI
+./setup_aks.sh
+
+# Generate Dockerfile
+func init --docker-only --python
+
+# Build the docker image
+docker build -t "${ACR_REGISTRY}.azurecr.io/${FUNCTION_APP_NAME}:latest" .
+```
+
+Then dockerize the app and deploy it to AKS.
+
+```bash
+# Optionaly (typically saves time :eyes:) Test the image locally
+docker run -p 7071:7071 -it "${ACR_REGISTRY}.azurecr.io/${FUNCTION_APP_NAME}:latest"
+
+docker push "${ACR_REGISTRY}.azurecr.io/${FUNCTION_APP_NAME}:latest"
+
+func kubernetes deploy \
+    --python \
+    --name "${FUNCTION_APP_NAME}" \
+    --registry "${ACR_REGISTRY}.azurecr.io" --dry-run > deploy.yml
+
+# Beware!!! doesnt seem to work with event hub trigger function - temporarily deleted
+# https://stackoverflow.com/questions/71901186/event-hub-triggered-azure-function-running-on-aks-with-keda-does-not-scale-out
 ```
