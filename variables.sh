@@ -20,3 +20,7 @@ COLLECTION_2="posts"
 
 # Frontend
 WEB_APP_NAME="frontend-${SUFFIX}"
+
+# Dockerize app
+ACR_REGISTRY="registry${SUFFIX}"
+AKS_CLUSTER="aks-cluster-${SUFFIX}"
