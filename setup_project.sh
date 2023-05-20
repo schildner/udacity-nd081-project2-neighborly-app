@@ -8,27 +8,7 @@ NC='\033[0m' # No Color
 # shellcheck disable=SC1091
 source ./variables.sh
 
-# Create Function App
 az group create -n "${RG_NAME}" -l "${LOCATION}"
-az storage account create -n "${STORAGE_ACCOUNT_NAME}" --location "${LOCATION}" -g "${RG_NAME}" --sku Standard_LRS
-
-az appservice plan create \
-    -n "backend_asp" \
-    -g "${RG_NAME}" \
-    --is-linux \
-    --number-of-workers 1 \
-    --sku B1 \
-    --location "${LOCATION}"
-
-az functionapp create \
-    -n "${FUNCTION_APP_NAME}" \
-    -g "${RG_NAME}" \
-    --plan "backend_asp" \
-    --runtime python \
-    --runtime-version 3.8 \
-    --functions-version 4 \
-    --os-type linux \
-    -s "${STORAGE_ACCOUNT_NAME}"
 
 # Create a Cosmos account for MongoDB
 az cosmosdb create \
@@ -93,17 +73,50 @@ mongoimport --uri "${DB_CONNECTION_STRING}" \
     --file='./sample_data/samplePosts.json' \
     --jsonArray
 
+# Create Function App
+az storage account create -n "${STORAGE_ACCOUNT_NAME}" --location "${LOCATION}" -g "${RG_NAME}" --sku Standard_LRS
+
+az appservice plan create \
+    -n "backend_asp" \
+    -g "${RG_NAME}" \
+    --is-linux \
+    --number-of-workers 1 \
+    --sku B1 \
+    --location "${LOCATION}"
+
+az functionapp create \
+    -n "${FUNCTION_APP_NAME}" \
+    -g "${RG_NAME}" \
+    --plan "backend_asp" \
+    --runtime python \
+    --runtime-version 3.8 \
+    --functions-version 4 \
+    --os-type linux \
+    -s "${STORAGE_ACCOUNT_NAME}"
+
 # Deploy the function app
 cd NeighborlyAPI || exit
 python -m venv .venv
 # shellcheck disable=SC1091
 source .venv/bin/activate
 python -m pip install -r requirements.txt
-func azure functionapp publish app-es81 --python --build remote
+func azure functionapp publish "${FUNCTION_APP_NAME}" \
+    --python \
+    --build remote
 
 cd ..
 # Deploy the web app
 cd NeighborlyFrontEnd || exit
+
+# install dependencies via pipenv
+#pipenv install
+#pipenv shell
+
+# alternatively install dependencies via pip install
+python -m venv .venv
+# shellcheck disable=SC1091
+source .venv/bin/activate
+pip install -r requirements.txt
 
 az webapp up \
     -n "${WEB_APP_NAME}"\
@@ -112,8 +125,6 @@ az webapp up \
     -p frontend_asp \
     --sku F1 \
     --os-type Linux
-
-
 
 echo "To delete all resources, run the following command:"
 echo -e "${RED}az group delete --name ${RG_NAME} --no-wait --yes${NC}"
