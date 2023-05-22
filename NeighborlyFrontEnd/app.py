@@ -46,13 +46,12 @@ def rss():
     fg = FeedGenerator()
     fg.title('Feed title')
     fg.description('Feed Description')
-    fg.link(href='https://neighborly-client-v1.azurewebsites.net/')
-    
+    fg.link(href='https://frontend-es81.azurewebsites.net/')
 
     response = requests.get(settings.API_URL + '/getAdvertisements')
     ads = response.json()
 
-    for a in ads: 
+    for a in ads:
         fe = fg.add_entry()
         fe.title(a.title)
         fe.description(a.description)
