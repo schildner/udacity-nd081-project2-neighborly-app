@@ -134,3 +134,31 @@ func kubernetes deploy \
 # Beware!!! doesnt seem to work with event hub trigger function - temporarily deleted
 # https://stackoverflow.com/questions/71901186/event-hub-triggered-azure-function-running-on-aks-with-keda-does-not-scale-out
 ```
+
+## Logic App
+
+Configured in Azure Portal as follows:
+
+1. Create Communcation Service: Resource Group > Add > Communication Service: `cs-es81`
+   - Copy the connection string from the newly created resource: Keys > Primary Connection String
+2. Create Communication Email Service: Resource Group > Add > Communication Email Service: `ces-es81`
+   - Provision Domains > Add Domain (Free) - You can only have one Azure subdomain per Email Communication Services!
+   - Domain name auto-created: `915cc553-5a4d-4598-8a5b-ac1d2001332d.azurecomm.net`
+     - Click on the domain > MailFrom addresses > Add:
+
+       Display name: `Udacity Project EduBot`
+       MailFrom address: `edubot-es81` @15cc553-5a4d-5a.....`
+
+3. Create a Logic App: Resource Group > Add > Logic App: `logic-app-es81`
+4. Logic App Designer
+
+   - Trigger: When a HTTP request is received
+     - Method: `GET`
+     - URL: (auto-generated after save) `https://prod-36.eastus.logic.azure.com:443/workflows/3e0348e4aaef479db702cd04371eeb33/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=5dVi8Ivn_-TRSTUUoGtHgBZ7OI2xAfyeoV7ggubcP50`
+   - Action: Send email (Preview)
+     - Subject: `Somebody triggered Logic App's Custom HTTP Request`
+     - To: `eduard.***@gmail.com`
+     - From: `edubot-es81@915cc553-5a4d-4598-8a5b-ac1d2001332d.azurecomm.net`
+     - Body: `Yep, the logic-app-es81's custom HTTP GET Request was triggered.`
+     - :information_source: Connection: make sure it's connected to the `cs-es81` resource, paste Connection String from step 1.
+
