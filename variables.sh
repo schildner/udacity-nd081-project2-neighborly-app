@@ -24,3 +24,6 @@ WEB_APP_NAME="frontend-${SUFFIX}"
 # Dockerize app
 ACR_REGISTRY="registry${SUFFIX}"
 AKS_CLUSTER="aks-cluster-${SUFFIX}"
+
+# Loci App
+LOGIC_APP_NAME="logic-app-${SUFFIX}"

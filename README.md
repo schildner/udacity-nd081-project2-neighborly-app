@@ -6,7 +6,7 @@ See the full [project instructions](https://github.com/udacity/nd081-c2-Building
 
 1. Create function app
 2. Deploy client-side web application
-3. Dockerfize function app and deploy to AKS
+3. Dockerize function app and deploy to AKS
 4. Event Hubs and Logic App
 5. Screenshot and Deliverables
 
@@ -116,14 +116,16 @@ func init --docker-only --python
 docker build -t "${ACR_REGISTRY}.azurecr.io/${FUNCTION_APP_NAME}:latest" .
 ```
 
-Then dockerize the app and deploy it to AKS.
+Push the image & optionaly test it locally (typically **saves time :eyes:**)
 
 ```bash
-# Optionaly (typically saves time :eyes:) Test the image locally
 docker run -p 7071:7071 -it "${ACR_REGISTRY}.azurecr.io/${FUNCTION_APP_NAME}:latest"
-
 docker push "${ACR_REGISTRY}.azurecr.io/${FUNCTION_APP_NAME}:latest"
+```
 
+Then deploy the app to AKS.
+
+```bash
 func kubernetes deploy \
     --python \
     --name "${FUNCTION_APP_NAME}" \
@@ -132,3 +134,31 @@ func kubernetes deploy \
 # Beware!!! doesnt seem to work with event hub trigger function - temporarily deleted
 # https://stackoverflow.com/questions/71901186/event-hub-triggered-azure-function-running-on-aks-with-keda-does-not-scale-out
 ```
+
+## Logic App
+
+Configured in Azure Portal as follows:
+
+1. Create Communcation Service: Resource Group > Add > Communication Service: `cs-es81`
+   - Copy the connection string from the newly created resource: Keys > Primary Connection String
+2. Create Communication Email Service: Resource Group > Add > Communication Email Service: `ces-es81`
+   - Provision Domains > Add Domain (Free) - You can only have one Azure subdomain per Email Communication Services!
+   - Domain name auto-created: `915cc553-5a4d-4598-8a5b-ac1d2001332d.azurecomm.net`
+     - Click on the domain > MailFrom addresses > Add:
+
+       Display name: `Udacity Project EduBot`
+       MailFrom address: `edubot-es81` @15cc553-5a4d-5a.....`
+
+3. Create a Logic App: Resource Group > Add > Logic App: `logic-app-es81`
+4. Logic App Designer
+
+   - Trigger: When a HTTP request is received
+     - Method: `GET`
+     - URL: (auto-generated after save) `https://prod-36.eastus.logic.azure.com:443/workflows/3e0348e4aaef479db702cd04371eeb33/triggers/manual/paths/invoke?api-version=2016-10-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=5dVi8Ivn_-TRSTUUoGtHgBZ7OI2xAfyeoV7ggubcP50`
+   - Action: Send email (Preview)
+     - Subject: `Somebody triggered Logic App's Custom HTTP Request`
+     - To: `eduard.***@gmail.com`
+     - From: `edubot-es81@915cc553-5a4d-4598-8a5b-ac1d2001332d.azurecomm.net`
+     - Body: `Yep, the logic-app-es81's custom HTTP GET Request was triggered.`
+     - :information_source: Connection: make sure it's connected to the `cs-es81` resource, paste Connection String from step 1.
+
