@@ -18,5 +18,4 @@ def main(event: func.EventGridEvent):
         'event_type': event.event_type,
     })
 
-
     logging.info('Python EventGrid trigger processed an event: %s', result)
