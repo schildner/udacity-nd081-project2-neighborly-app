@@ -21,8 +21,8 @@ az cosmosdb create \
 
 # Create a JSON file in the current directory defining the index policy for the collection.
 # The indexing policy file defines which field to create an index on for faster search/read.
-printf ' 
-[ 
+printf '
+[
     {
         "key": {"keys": ["_id"]}
     }
