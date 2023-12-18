@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # shellcheck disable=SC1091
-source ./variables.sh
+source ../variables.sh
 
 # Create Azure Container Registry
 az acr create \

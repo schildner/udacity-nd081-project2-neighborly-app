@@ -1,23 +1,36 @@
 import logging
+import os
+
 import azure.functions as func
 import pymongo
-import json
+import pymongo.errors
 from bson.json_util import dumps
 
 
 def main(req: func.HttpRequest) -> func.HttpResponse:
-
     logging.info('Python getPosts trigger function processed a request.')
 
     try:
-        url = "mongodb://cosmos-db-account-es81:9ViJPEBPVrmgwFfQacsKvX2FRJJiNP6ijT8Yv5RqCKgIgZNzFpg0ZaEulmafCPD3LoXTrsMixbQVACDbLrsGBQ==@cosmos-db-account-es81.mongo.cosmos.azure.com:10255/?ssl=true&replicaSet=globaldb&retrywrites=false&maxIdleTimeMS=120000&appName=@cosmos-db-account-es81@"
-        client = pymongo.MongoClient(url)
+        uri = os.getenv('MyDbConnection')
+        if uri is None:
+            logging.error("DB connection string must be set in MyDbConnection env var.")
+            return func.HttpResponse("Database connection string is not set.", status_code=500)
+
+        client = pymongo.MongoClient(uri)
         database = client['dbes81']
         collection = database['posts']
 
         result = collection.find({})
         result = dumps(result)
 
-        return func.HttpResponse(result, mimetype="application/json", charset='utf-8', status_code=200)
-    except:
-        return func.HttpResponse("Bad request.", status_code=400)
+        return func.HttpResponse(result,
+                                 mimetype="application/json",
+                                 charset='utf-8',
+                                 status_code=200)
+
+    except pymongo.errors.ConnectionFailure as e:
+        logging.error(e)
+        return func.HttpResponse("Database connection error.", status_code=500)
+    except Exception as e:
+        logging.error(e)
+        return func.HttpResponse("An error occurred.", status_code=500)

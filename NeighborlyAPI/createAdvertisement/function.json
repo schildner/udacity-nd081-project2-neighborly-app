@@ -14,14 +14,6 @@
       "type": "http",
       "direction": "out",
       "name": "$return"
-    },
-    {
-      "type": "eventGrid",
-      "name": "outputEvent",
-      "topicEndpointUri": "MyEventGridTopicEndpointURL",
-      "topicKeySetting": "MyEventGridTopicAccessKey1",
-      "direction": "out"
     }
-  ],
-  "disabled": false
+  ]
 }
