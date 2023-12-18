@@ -89,10 +89,15 @@ az functionapp create \
     -g "${RG_NAME}" \
     --plan "backend_asp" \
     --runtime python \
-    --runtime-version 3.8 \
+    --runtime-version 3.11 \
     --functions-version 4 \
     --os-type linux \
     -s "${STORAGE_ACCOUNT_NAME}"
+
+az functionapp config appsettings set \
+    -n "${FUNCTION_APP_NAME}" \
+    -g "${RG_NAME}" \
+    --settings "MyDbConnection=${DB_CONNECTION_STRING}"
 
 # Deploy the function app
 cd NeighborlyAPI || exit
