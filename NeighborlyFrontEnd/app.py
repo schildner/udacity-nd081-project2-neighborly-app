@@ -1,29 +1,32 @@
+import json
 import logging.config
 import os
-from flask import Flask, Blueprint, request, jsonify, render_template, redirect, url_for
-from flask_bootstrap import Bootstrap
-import settings
-import requests
-import json
-from feedgen.feed import FeedGenerator
-from flask import make_response
 from urllib.parse import urljoin
-from werkzeug.contrib.atom import AtomFeed
+
+import requests
+from feedgen.feed import FeedGenerator
+from flask import (Blueprint, Flask, jsonify, make_response, redirect,
+                   render_template, request, url_for)
+from flask_bootstrap import Bootstrap
+# from werkzeug.contrib.atom import AtomFeed
+
+import settings
+
 
 app = Flask(__name__)
+app.config.from_object(settings)
 Bootstrap(app)
 
 
-
 def get_abs_url(url):
-    """ Returns absolute url by joining post url with base url """
+    """Returns absolute url by joining post url with base url."""
     return urljoin(request.url_root, url)
 
 
 @app.route('/feeds/')
 def feeds():
-    feed = AtomFeed(title='All Advertisements feed',
-                    feed_url=request.url, url=request.url_root)
+    # feed = AtomFeed(title='All Advertisements feed',
+    #                feed_url=request.url, url=request.url_root)
 
     response = requests.get(settings.API_URL + '/getAdvertisements')
     posts = response.json()
@@ -60,13 +63,14 @@ def rss():
     response.headers.set('Content-Type', 'application/rss+xml')
     return response
 
+
 @app.route('/')
 def home():
-    response = requests.get(settings.API_URL + '/getAdvertisements')
-    response2 = requests.get(settings.API_URL + '/getPosts')
+    ads_response = requests.get(settings.API_URL + '/getAdvertisements')
+    posts_response = requests.get(settings.API_URL + '/getPosts')
 
-    ads = response.json()
-    posts = response2.json()
+    ads = ads_response.json()
+    posts = posts_response.json()
     return render_template("index.html", ads=ads, posts=posts)
 
 
@@ -88,11 +92,13 @@ def delete_ad_view(id):
     ad = response.json()
     return render_template("delete_ad.html", ad=ad)
 
+
 @app.route('/ad/view/<id>', methods=['GET'])
 def view_ad_view(id):
     response = requests.get(settings.API_URL + '/getAdvertisement?id=' + id)
     ad = response.json()
     return render_template("view_ad.html", ad=ad)
+
 
 @app.route('/ad/new', methods=['POST'])
 def add_ad_request():
@@ -108,6 +114,7 @@ def add_ad_request():
     response = requests.post(settings.API_URL + '/createAdvertisement', json=json.dumps(req_data))
     return redirect(url_for('home'))
 
+
 @app.route('/ad/update/<id>', methods=['POST'])
 def update_ad_request(id):
     # Get item from the POST body
@@ -122,11 +129,13 @@ def update_ad_request(id):
     response = requests.put(settings.API_URL + '/updateAdvertisement?id=' + id, json=json.dumps(req_data))
     return redirect(url_for('home'))
 
+
 @app.route('/ad/delete/<id>', methods=['POST'])
 def delete_ad_request(id):
     response = requests.delete(settings.API_URL + '/deleteAdvertisement?id=' + id)
     if response.status_code == 200:
         return redirect(url_for('home'))
+
 
 # running app
 def main():

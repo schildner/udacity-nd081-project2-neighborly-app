@@ -1,8 +1,9 @@
-#--------- Flask settings
-SERVER_HOST = 'https://frontend-es81.azurewebsites.net' # Update this for the appropriate front-end website when up
-#SERVER_HOST = '0.0.0.0' # Update this for the appropriate front-end website when up
-SERVER_PORT = 5000
-FLASK_DEBUG = True # Do not use debug mode in prod
+# --------- Flask settings
+# SERVER_HOST = 'https://frontend-es81.azurewebsites.net'  # Update this for the appropriate front-end website when up
+SERVER_HOST = '0.0.0.0'  # Update this for the appropriate front-end website when up
+# SERVER_PORT = 5000
+SERVER_PORT = 5555
+FLASK_DEBUG = True  # Do not use debug mode in prod
 
 # Flask-Restplus settings
 SWAGGER_UI_DOC_EXPANSION = 'list'
@@ -11,7 +12,7 @@ RESTPLUS_MASK_SWAGGER = False
 RESTPLUS_404_HELP = True
 API_VERSION = 'v1'
 
-#-------- Azure constants
+# -------- Azure constants
 
 # API_URL format: "https://[FUNCTION_APP_NAME_GOES_HERE].azurewebsites.net"
 API_URL = "https://app-es81.azurewebsites.net/api"
